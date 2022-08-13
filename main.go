@@ -78,7 +78,7 @@ func main() {
 
 	fmt.Printf("-- Please wait. This is expected to take approximately %v seconds. --\n", len(dataAll))
 
-	for _, sub := range dataAll {
+	for i, sub := range dataAll {
 		url := fmt.Sprintf("https://atcoder.jp/contests/%v/submissions/%v", sub.ContestID, sub.ID)
 		code, err := submissionRequest(url)
 		if err != nil {
@@ -112,6 +112,7 @@ func main() {
 		file.WriteString(code)
 		file.Close()
 
+		fmt.Printf("%v/%v %v\n", i+1, len(dataAll), fmt.Sprintf("%v/%v.%v", sub.ContestID, fileName, extension))
 		time.Sleep(time.Second)
 	}
 
