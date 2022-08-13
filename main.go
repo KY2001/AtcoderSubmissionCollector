@@ -103,8 +103,9 @@ func main() {
 		} else {
 			extension = "txt"
 		}
+		fileName := fmt.Sprintf("%v_%v", sub.ProblemID, sub.EpochSecond)
 
-		file, err := os.Create(fmt.Sprintf("./%v/%v/%v.%v", dirName, sub.ContestID, sub.ProblemID, extension))
+		file, err := os.Create(fmt.Sprintf("./%v/%v/%v.%v", dirName, sub.ContestID, fileName, extension))
 		if err != nil {
 			fmt.Println(err)
 		}
