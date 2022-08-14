@@ -37,9 +37,9 @@ func main() {
 		return
 	}
 
-	epochSecond := 0 // A single informationRequest can retrieve data on 500 submissions from this time.
+	epochSecond := 0 // A single informationRequest can retrieve data on 500 submissions.
 	var dataAll []Submission
-	fmt.Println("-- Please wait. I am checking the number of your submissions --")
+	fmt.Println("-- Please wait. I'm checking the number of your submissions --")
 	for i := 0; ; i++ {
 		url := fmt.Sprintf("https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user=%s&from_second=%d", userName, epochSecond)
 		data, err := informationRequest(url)
@@ -103,16 +103,32 @@ func main() {
 		} else {
 			extension = "txt"
 		}
+
 		fileName := fmt.Sprintf("%v_%v", sub.ProblemID, sub.EpochSecond)
-
-		file, err := os.Create(fmt.Sprintf("./%v/%v/%v.%v", dirName, sub.ContestID, fileName, extension))
-		if err != nil {
-			fmt.Println(err)
-		}
-		file.WriteString(code)
-		file.Close()
-
+		filePath := fmt.Sprintf("./%v/%v/%v.%v", dirName, sub.ContestID, fileName, extension)
 		fmt.Printf("%v/%v %v\n", i+1, len(dataAll), fmt.Sprintf("%v/%v.%v", sub.ContestID, fileName, extension))
+
+		// check file existence
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			file, err := os.Create(filePath)
+			if err != nil {
+				log.Println("failed: ", err)
+				return
+			}
+			_, err = file.WriteString(code)
+			if err != nil {
+				log.Println("failed: ", err)
+				return
+			}
+			err = file.Close()
+			if err != nil {
+				log.Println("failed: ", err)
+				return
+			}
+		} else {
+			continue
+		}
+
 		time.Sleep(time.Second)
 	}
 
@@ -169,7 +185,7 @@ func submissionRequest(url string) (string, error) {
 	}
 	prefix := "<pre id=\\\"submission-code\\\" class=\\\"prettyprint linenums\\\">"
 	postfix := "</pre>"
-	r := regexp.MustCompile(fmt.Sprintf(`(?s)%s(.*)%s`, prefix, postfix))
+	r := regexp.MustCompile(fmt.Sprintf(`(?s)%s(.*?)%s`, prefix, postfix))
 	ret = r.FindString(string(body))
 
 	ret = html.UnescapeString(ret[len(prefix)-4 : len(ret)-len(postfix)])
